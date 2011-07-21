@@ -1,0 +1,3 @@
+Python client for the new ahrefs.com API.
+
+Currently supports pulling backlinks, with various filters. See __init__.py for very basic usage. Returns a dict of 'url : dict of data.
