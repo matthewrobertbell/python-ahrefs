@@ -10,8 +10,6 @@ class ahrefs(object):
 		
 	def links(self,target,mode='exact',internal=False,count=1000,timeout=30,filter_nofollow=None,filter_link_type=None,filter_date_newer=None,filter_date_older=None):
 		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=inlinks&mode=%s&include_internal=%s&count=%s&target=%s' % (self.key,mode,str(internal).lower(),count,target)
-		print request_url
-		#response = open('example.xml').read()
 		response = urllib2.urlopen(request_url,timeout=timeout).read()
 		response_doc = etree.XML(response)
 		results = defaultdict(list)
@@ -40,7 +38,6 @@ class ahrefs(object):
 				else:
 					if parsed_result['is_nofollow']:
 						break
-			print parsed_result
 			if filter_date_newer:
 				if isinstance(filter_date_newer,int):
 					filter_date = datetime.timedelta(days=filter_date)
