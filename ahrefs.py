@@ -19,11 +19,8 @@ class ahrefs(object):
 			for child in result.iterchildren():
 				text = child.text.strip()
 				tag = child.tag.strip().replace('{'+self.namespace+'}','')
-				if text.lower() == 'false':
-					text = False
-				else:
-					if text.lower() == 'true':
-						text = True
+				if text.lower() in ('true','false'):
+					text = text.lower() == 'true'
 				if tag == 'visited':
 					text = datetime.datetime.strptime(text,'%Y-%m-%dT%H:%M:%SZ')
 				parsed_result[tag] = text
