@@ -59,7 +59,7 @@ class ahrefs(object):
 		
 		
 	def links(self,target,mode='exact',internal=False,count=1000,timeout=30,filter_nofollow=None,filter_link_type=None,filter_date_newer=None,filter_date_older=None,simple_results=True):
-		mathod_name = 'links'
+		method_name = 'links'
 		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=inlinks&mode=%s&include_internal=%s&count=%s&target=%s' % (self.key,mode,str(internal).lower(),count,target)
 		response = self.request(request_url,timeout)
 		results = defaultdict(list)
