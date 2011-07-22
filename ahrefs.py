@@ -80,21 +80,21 @@ class ahrefs(object):
 			results[parsed_result['destination_url']].append(parsed_result)
 		return results
 		
-	def pages(self,target,mode='domain',count=1000,timeout=30,filter_date_newer=None,filter_date_older=None,filter_http_code=None,filter_size_larger=None,filter_size_smaller=None):
+	def pages(self,target,mode='domain',count=1000,timeout=30,filter_date_newer=None,filter_date_older=None,filter_http_code=None,filter_http_code_include=False,filter_size_larger=None,filter_size_smaller=None):
 		method_name = 'pages'
 		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=pages&count=%s&mode=%s&target=%s' % (self.key,count,mode,target)
-		print request_url
 		response = self.request(request_url,timeout)
 		results = []
+		if filter_http_code:
+			filter_http_code = [int(code) for code in filter_http_code]
 		for result in response.xpath('//n:result',namespaces={'n': self.namespace % method_name}):
-			print result
 			parsed_result = self.parse_result(result,method_name)
-			print parsed_result
 			if not self.filter_date(parsed_result,filter_date_newer,filter_date_older):
 				break
 			if filter_http_code:
-				filter_http_code = [int(code) for code in filter_http_code]
-				if parsed_result['http_code'] not in filter_http_code:
+				if filter_http_code_include and parsed_result['http_code'] not in filter_http_code:
+					break
+				if not filter_http_code_include and parsed_result['http_code'] in filter_http_code:
 					break
 			if filter_size_larger:
 				if parsed_result['size'] > filter_size_larger:
