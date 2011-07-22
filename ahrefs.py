@@ -58,7 +58,7 @@ class ahrefs(object):
 		return True
 		
 		
-	def links(self,target,mode='exact',internal=False,count=1000,timeout=30,filter_nofollow=None,filter_link_type=None,filter_date_newer=None,filter_date_older=None):
+	def links(self,target,mode='exact',internal=False,count=1000,timeout=30,filter_nofollow=None,filter_link_type=None,filter_date_newer=None,filter_date_older=None,simple_results=True):
 		mathod_name = 'links'
 		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=inlinks&mode=%s&include_internal=%s&count=%s&target=%s' % (self.key,mode,str(internal).lower(),count,target)
 		response = self.request(request_url,timeout)
@@ -78,6 +78,12 @@ class ahrefs(object):
 			if not self.filter_date(parsed_result,filter_date_newer,filter_date_older):
 				break
 			results[parsed_result['destination_url']].append(parsed_result)
+		if simple_results:
+			new_results = []
+			for v in results.values():
+				for result in v:
+					new_results.append(result)
+			return results
 		return results
 		
 	def pages(self,target,mode='domain',count=1000,timeout=30,filter_date_newer=None,filter_date_older=None,filter_http_code=None,filter_http_code_include=False,filter_size_larger=None,filter_size_smaller=None):
