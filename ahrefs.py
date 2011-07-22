@@ -10,7 +10,6 @@ class ahrefs(object):
 		
 	def request(self,request_url,timeout):
 		response = urllib2.urlopen(request_url,timeout=timeout).read()
-		print response
 		return etree.XML(response)
 		
 	def parse_result(self,result,method_name):
@@ -83,7 +82,7 @@ class ahrefs(object):
 			for v in results.values():
 				for result in v:
 					new_results.append(result)
-			return results
+			return new_results
 		return results
 		
 	def pages(self,target,mode='domain',count=1000,timeout=30,filter_date_newer=None,filter_date_older=None,filter_http_code=None,filter_http_code_include=False,filter_size_larger=None,filter_size_smaller=None):
