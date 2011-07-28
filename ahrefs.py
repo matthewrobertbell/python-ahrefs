@@ -6,25 +6,20 @@ from lxml import etree
 class ahrefs(object):
 	def __init__(self,key):
 		self.key = key
-		self.namespace = 'http://ahrefs.com/schemas/api/%s/1'
+		self.namespace = 'http://ahrefs.com/schemas/api/%s/%s'
 		
 	def request(self,request_url,timeout):
 		response = urllib2.urlopen(request_url,timeout=timeout).read()
 		return etree.XML(response)
 		
-	def parse_result(self,result,method_name):
+	def parse_result(self,result,method_name,version):
 		parsed_result = {}
 		for child in result.iterchildren():
-			text = child.text.strip()
-			tag = child.tag.strip().replace('{'+self.namespace % method_name+'}','')
-			if text.lower() in ('true','false'):
-				text = text.lower() == 'true'
-			if tag == 'visited':
-				text = datetime.datetime.strptime(text,'%Y-%m-%dT%H:%M:%SZ')
-			parsed_result[tag] = text
-		for child in result.iterchildren():
-			text = child.text.strip()
-			tag = child.tag.strip().replace('{'+self.namespace % method_name+'}','')
+			if child.text:
+				text = child.text.strip()
+			else:
+				text = ''
+			tag = child.tag.strip().replace('{'+self.namespace % (method_name,version)+'}','')
 			if text.lower() in ('true','false'):
 				text = text.lower() == 'true'
 			if tag == 'visited':
@@ -54,16 +49,18 @@ class ahrefs(object):
 				filter_date = datetime.timedelta(days=filter_date)
 			if datetime.date.today() - filter_date_older < parsed_result['visited']:
 				return False
-		return True
-		
+		return True		
 		
 	def links(self,target,mode='exact',internal=False,count=1000,timeout=30,filter_nofollow=None,filter_link_type=None,filter_date_newer=None,filter_date_older=None,simple_results=True):
+		version = 1
 		method_name = 'links'
 		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=inlinks&mode=%s&include_internal=%s&count=%s&target=%s' % (self.key,mode,str(internal).lower(),count,target)
+		print self.namespace % (method_name,version)
 		response = self.request(request_url,timeout)
 		results = defaultdict(list)
-		for result in response.xpath('//n:result',namespaces={'n': self.namespace % method_name}):
-			parsed_result = self.parse_result(result,method_name)
+		for result in response.xpath('//n:result',namespaces={'n': self.namespace % (method_name,version)}):
+			print result
+			parsed_result = self.parse_result(result,method_name,version)
 			if filter_link_type:
 				if parsed_result['link_type'] not in filter_link_type:
 					break
@@ -85,15 +82,16 @@ class ahrefs(object):
 			return new_results
 		return results
 		
-	def pages(self,target,mode='domain',count=1000,timeout=30,filter_date_newer=None,filter_date_older=None,filter_http_code=None,filter_http_code_include=False,filter_size_larger=None,filter_size_smaller=None):
+	def pages(self,target,version=1,count=1000,timeout=30,filter_date_newer=None,filter_date_older=None,filter_http_code=None,filter_http_code_include=False,filter_size_larger=None,filter_size_smaller=None):
+		version = 1
 		method_name = 'pages'
-		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=pages&count=%s&mode=%s&target=%s' % (self.key,count,mode,target)
+		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=pages&count=%s&mode=domain&target=%s' % (self.key,count,target)
 		response = self.request(request_url,timeout)
 		results = []
 		if filter_http_code:
 			filter_http_code = [int(code) for code in filter_http_code]
-		for result in response.xpath('//n:result',namespaces={'n': self.namespace % method_name}):
-			parsed_result = self.parse_result(result,method_name)
+		for result in response.xpath('//n:result',namespaces={'n': self.namespace % (method_name,version)}):
+			parsed_result = self.parse_result(result,method_name,version)
 			if not self.filter_date(parsed_result,filter_date_newer,filter_date_older):
 				break
 			if filter_http_code:
@@ -109,4 +107,20 @@ class ahrefs(object):
 					break
 			results.append(parsed_result)
 		return results
+		
+	def balance(self,timeout=30):
+		version = 0
+		method_name = 'meta'
+		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=get_units_left' % (self.key)
+		response = self.request(request_url,timeout)
+		return float(response.xpath('//n:api_units_left/text()',namespaces={'n': self.namespace % (method_name,version)})[0])
+		
+	def count_anchor_links(self,target,anchor,timeout=30):
+		version = 0
+		method_name = 'anchors'
+		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=search_anchor&anchor=%s&target=%s' % (self.key,anchor,target)
+		print request_url
+		response = self.request(request_url,timeout)
+		return int(response.xpath('//n:count/text()',namespaces={'n': self.namespace % (method_name,version)})[0])
+		
 			
