@@ -2,6 +2,7 @@ import urllib2
 import datetime
 from collections import defaultdict
 from lxml import etree
+import urllib
 
 class ahrefs(object):
 	def __init__(self,key):
@@ -55,11 +56,9 @@ class ahrefs(object):
 		version = 1
 		method_name = 'links'
 		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=inlinks&mode=%s&include_internal=%s&count=%s&target=%s' % (self.key,mode,str(internal).lower(),count,target)
-		print self.namespace % (method_name,version)
 		response = self.request(request_url,timeout)
 		results = defaultdict(list)
 		for result in response.xpath('//n:result',namespaces={'n': self.namespace % (method_name,version)}):
-			print result
 			parsed_result = self.parse_result(result,method_name,version)
 			if filter_link_type:
 				if parsed_result['link_type'] not in filter_link_type:
@@ -119,7 +118,6 @@ class ahrefs(object):
 		version = 0
 		method_name = 'anchors'
 		request_url = 'http://ahrefs.com/api.php?AhrefsKey=%s&type=search_anchor&anchor=%s&target=%s' % (self.key,anchor,target)
-		print request_url
 		response = self.request(request_url,timeout)
 		return int(response.xpath('//n:count/text()',namespaces={'n': self.namespace % (method_name,version)})[0])
 		
