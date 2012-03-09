@@ -1,3 +1,5 @@
-Python client for the new ahrefs.com API.
+Python client for the ahrefs.com API.
 
-Currently supports pulling backlinks, with various filters. See __init__.py for very basic usage. Returns a dict of {url : [dicts of data]}.
+Some stuff implemented, some stuff not, should be simple to add methods.
+
+Call method, get (decoded) JSON data, you can't explain that.
