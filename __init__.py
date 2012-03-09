@@ -9,7 +9,7 @@ class ahrefs(object):
 		self.key = key
 		
 	def request(self, method_name, **kwargs):
-		if kwargs['mode'] not in MODES:
+		if 'mode' in kwargs and kwargs['mode'] not in MODES:
 			raise Exception('Mode must be one of: '+', '.join(MODES))
 		kwargs['output'] = 'json'
 		kwargs['AhrefsKey'] = self.key
@@ -22,4 +22,4 @@ class ahrefs(object):
 		return self.request(method_name='get_backlinks', target=target, count=count, mode=mode)
 
 	def api_units_left(self):
-		return self.request(method_name='get_units_left', mode=MODES[0])
+		return self.request(method_name='get_units_left')
