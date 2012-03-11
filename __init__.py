@@ -30,3 +30,6 @@ class ahrefs(object):
 	def total_count_details(self, target, mode=MODES[0]):
 		return self.request(method_name='get_ref_domains_ips_count', target=target, mode=mode)
 
+	def crawled_pages(self, target, count=100, mode=MODES[0]):
+		return self.request(method_name='get_pages', target=target, count=count, mode=mode)
+
