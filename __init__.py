@@ -33,3 +33,6 @@ class ahrefs(object):
 	def crawled_pages(self, target, count=100, mode=MODES[0]):
 		return self.request(method_name='get_pages', target=target, count=count, mode=mode)
 
+	def anchors(self, target, count=100, mode=MODES[0]):
+		return self.request(method_name='get_anchors_of_backlinks', target=target, count=count, mode=mode)
+
